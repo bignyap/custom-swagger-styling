@@ -11,7 +11,7 @@ class AugmentingLayout extends React.Component {
     return (
       <div>
         <div className="myCustomHeader">
-          <h1>🚀 Welcome to My API Explorer</h1>
+          <h1>🚀 Swagger Petstore</h1>
         </div>
         <BaseLayout />
       </div>
