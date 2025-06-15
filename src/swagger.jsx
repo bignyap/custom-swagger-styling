@@ -1,49 +1,59 @@
-import React from "react"
-import SwaggerUI from 'swagger-ui-react'
-import 'swagger-ui-react/swagger-ui.css'
-import './custom-swagger-styles.css' // Import improved styles
+import React, { useEffect, useState } from "react";
+import SwaggerUI from 'swagger-ui-react';
+import 'swagger-ui-react/swagger-ui.css';
+import './custom-swagger-styles.css';
 
-class AugmentingLayout extends React.Component {
-  render() {
-    const { getComponent } = this.props
-    const BaseLayout = getComponent("BaseLayout", true)
-    const headerTitle = process.env.SWAGGER_HEADER || "Swagger Documentation"
+const AugmentingLayout = ({ getComponent, headerTitle }) => {
+  const BaseLayout = getComponent("BaseLayout", true);
 
-    return (
-      <div>
-        <div className="myCustomHeader">
-          <h1>🚀 {headerTitle}</h1>
-        </div>
-        <BaseLayout />
+  return (
+    <div>
+      <div className="myCustomHeader">
+        <h1>🚀 {headerTitle}</h1>
       </div>
-    )
-  }
-}
+      <BaseLayout />
+    </div>
+  );
+};
 
-const AugmentingLayoutPlugin = () => {
-  return {
-    components: {
-      AugmentingLayout: AugmentingLayout
-    },
-    wrapComponents: {
-      Topbar: () => () => null,
-      Models: () => () => null
-    }
-  }
-}
+const SwaggerUIComponent = () => {
+  const [swaggerUrl, setSwaggerUrl] = useState(null);
+  const [headerTitle, setHeaderTitle] = useState("Swagger Documentation");
 
-const SwaggerUIComponent = ({ url }) => {
-    return (
-      <SwaggerUI
-        url={url}
-        plugins={[AugmentingLayoutPlugin]}
-        layout={"AugmentingLayout"}
-        docExpansion="none"
-        defaultModelsExpandDepth={-1}
-        defaultModelExpandDepth={0}
-      />
-    )
-  }
-  
+  useEffect(() => {
+    fetch('/config.json')
+      .then(res => res.json())
+      .then(config => {
+        setSwaggerUrl(config.SWAGGER_JSON || 'apidoc/swagger.yaml');
+        setHeaderTitle(config.SWAGGER_HEADER || 'Swagger Documentation');
+      });
+  }, []);
 
-export default SwaggerUIComponent
+  const AugmentingLayoutPlugin = () => {
+    return {
+      components: {
+        AugmentingLayout: (props) =>
+          <AugmentingLayout {...props} headerTitle={headerTitle} />
+      },
+      wrapComponents: {
+        Topbar: () => () => null,
+        Models: () => () => null
+      }
+    };
+  };
+
+  if (!swaggerUrl) return <div>Loading Swagger UI...</div>;
+
+  return (
+    <SwaggerUI
+      url={swaggerUrl}
+      plugins={[AugmentingLayoutPlugin]}
+      layout={"AugmentingLayout"}
+      docExpansion="none"
+      defaultModelsExpandDepth={-1}
+      defaultModelExpandDepth={0}
+    />
+  );
+};
+
+export default SwaggerUIComponent;
