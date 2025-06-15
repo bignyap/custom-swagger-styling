@@ -7,11 +7,12 @@ class AugmentingLayout extends React.Component {
   render() {
     const { getComponent } = this.props
     const BaseLayout = getComponent("BaseLayout", true)
+    const headerTitle = process.env.REACT_APP_SWAGGER_HEADER || "Swagger Documentation"
 
     return (
       <div>
         <div className="myCustomHeader">
-          <h1>🚀 Swagger Petstore</h1>
+          <h1>🚀 {headerTitle}</h1>
         </div>
         <BaseLayout />
       </div>
