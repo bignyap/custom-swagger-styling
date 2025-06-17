@@ -9,7 +9,7 @@ const AugmentingLayout = ({ getComponent, headerTitle }) => {
   return (
     <div>
       <div className="myCustomHeader">
-        <h1>🚀 {headerTitle}</h1>
+        <h1>{headerTitle}</h1>
       </div>
       <BaseLayout />
     </div>
@@ -21,13 +21,15 @@ const SwaggerUIComponent = () => {
   const [headerTitle, setHeaderTitle] = useState("Swagger Documentation");
 
   useEffect(() => {
-    fetch('/config.json')
-      .then(res => res.json())
-      .then(config => {
-        setSwaggerUrl(config.SWAGGER_JSON || 'apidoc/swagger.yaml');
-        setHeaderTitle(config.SWAGGER_HEADER || 'Swagger Documentation');
-      });
+    if (window.apiConfig) {
+      setSwaggerUrl(window.apiConfig.swaggerJson || 'apidoc/swagger.yaml');
+      setHeaderTitle(window.apiConfig.swaggerHeader || 'Swagger Documentation');
+    } else {
+      setSwaggerUrl('apidoc/swagger.yaml');
+      setHeaderTitle('Swagger Documentation');
+    }
   }, []);
+  
 
   const AugmentingLayoutPlugin = () => {
     return {
@@ -45,15 +47,35 @@ const SwaggerUIComponent = () => {
   if (!swaggerUrl) return <div>Loading Swagger UI...</div>;
 
   return (
-    <SwaggerUI
-      url={swaggerUrl}
-      plugins={[AugmentingLayoutPlugin]}
-      layout={"AugmentingLayout"}
-      docExpansion="none"
-      defaultModelsExpandDepth={-1}
-      defaultModelExpandDepth={0}
-    />
+    <div>
+      <style>{`
+        .swagger-ui .info {
+          display: none !important;
+        }
+      `}</style>
+      <SwaggerUI
+        url={swaggerUrl}
+        plugins={[AugmentingLayoutPlugin]}
+        layout={"AugmentingLayout"}
+        deepLinking
+        docExpansion="none"
+        defaultModelsExpandDepth={-1}
+        defaultModelExpandDepth={0}
+        // layout="BaseLayout"
+      />
+    </div>
   );
+
+  // return (
+  //   <SwaggerUI
+  //     url={swaggerUrl}
+  //     plugins={[AugmentingLayoutPlugin]}
+  //     layout={"AugmentingLayout"}
+  //     docExpansion="none"
+  //     defaultModelsExpandDepth={-1}
+  //     defaultModelExpandDepth={0}
+  //   />
+  // );
 };
 
 export default SwaggerUIComponent;

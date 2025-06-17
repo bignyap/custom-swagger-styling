@@ -5,13 +5,13 @@ function App() {
   const [swaggerUrl, setSwaggerUrl] = useState(null);
 
   useEffect(() => {
-    fetch('/config.json')
-      .then(res => res.json())
-      .then(config => {
-        setSwaggerUrl(config.SWAGGER_JSON || 'apidoc/swagger.yaml');
-        console.log("Loaded Swagger URL from config:", config.SWAGGER_JSON);
-      });
+    if (window.apiConfig) {
+      setSwaggerUrl(window.apiConfig.swaggerJson || 'apidoc/swagger.yaml');
+    } else {
+      setSwaggerUrl('apidoc/swagger.yaml');
+    }
   }, []);
+  
 
   if (!swaggerUrl) return <div>Loading...</div>;
 
