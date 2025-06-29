@@ -1,0 +1,50 @@
+version: '3'
+
+vars:
+  SERVICE_NAME: styled-swagger-ui
+  GIT_HASH:
+    sh: git rev-parse --short HEAD
+  GIT_TAG:
+    sh: git describe --tags --exact-match HEAD 2>/dev/null || echo ""
+  CONTAINER_IMAGE_TAG: '{{if eq .GIT_TAG ""}}{{.GIT_HASH}}{{else}}{{.GIT_TAG}}{{end}}'
+  CONTAINER_IMAGE: '{{.SERVICE_NAME}}:{{.CONTAINER_IMAGE_TAG}}'
+  CONTAINER_IMAGE_LATEST: '{{.SERVICE_NAME}}:latest'
+  REPO_FOLDER:
+    sh: pwd
+
+tasks:
+  install:
+    desc: Install npm dependencies
+    cmds:
+      - cd {{.REPO_FOLDER}} && npm install
+
+  start-dev:
+    desc: Start React development server
+    cmds:
+      - cd {{.REPO_FOLDER}} && npm start
+
+  build-prod:
+    desc: Build React app for production
+    cmds:
+      - cd {{.REPO_FOLDER}} && npm run build
+
+  test:
+    desc: Run tests
+    cmds:
+      - cd {{.REPO_FOLDER}} && npm test
+
+  build-container:
+    desc: Build Docker container image
+    cmds:
+      - docker build -t {{.CONTAINER_IMAGE}} .
+      - docker tag {{.CONTAINER_IMAGE}} {{.CONTAINER_IMAGE_LATEST}}
+
+  start-container:
+    desc: Start container using docker-compose
+    cmds:
+      - docker compose -f docker-compose.yaml up -d
+
+  stop-container:
+    desc: Stop container using docker-compose
+    cmds:
+      - docker compose -f docker-compose.yaml down
