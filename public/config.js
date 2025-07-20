@@ -1,7 +1,9 @@
 window.apiConfig = {
-    swaggerJson: "apidoc/swagger.yaml",
     swaggerHeader: "Swagger Documentation",
-    title: "API Documentation | Swagger UI" 
+    title: "API Documentation | Swagger UI",
+    swaggerJson: {
+        "Pet": "apidoc/swagger.yaml"
+    }
 };
   
 
