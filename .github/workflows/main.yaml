@@ -8,7 +8,7 @@ on:
 
 env:
   SERVICE_NAME: styled-swagger-ui
-  DOCKERHUB_REPO: bignyap/styled-swagger-ui
+  DOCKERHUB_REPO: ${{ secrets.DOCKER_USERNAME }}/styled-swagger-ui
 
 jobs:
   build-and-push:
